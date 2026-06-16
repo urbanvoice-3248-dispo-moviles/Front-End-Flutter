@@ -3,11 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../domain/entities/incident_report.dart';
 import '../../domain/entities/location.dart';
 import '../bloc/location/location_bloc.dart';
 import '../bloc/report/report_bloc.dart';
 import '../widgets/app_drawer.dart';
 import 'alerts_page.dart';
+import 'incident_detail_page.dart';
 import 'report_incident_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,6 +26,10 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     context.read<LocationBloc>().add(GetAllLocationsEvent());
+    context.read<ReportBloc>().add(const GetNearbyReportsEvent(
+          latitude: AppConstants.mapDefaultLatitude,
+          longitude: AppConstants.mapDefaultLongitude,
+        ));
   }
 
   @override
@@ -31,91 +37,85 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('UrbanVoice'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shield_outlined),
-            onPressed: () {
-              context.read<ReportBloc>().add(const GetNearbyReportsEvent(
-                    latitude: AppConstants.mapDefaultLatitude,
-                    longitude: AppConstants.mapDefaultLongitude,
-                  ));
-            },
-          ),
-        ],
       ),
       drawer: const AppDrawer(),
       body: BlocBuilder<LocationBloc, LocationState>(
-        builder: (context, state) {
-          if (state is LocationsLoaded) {
-            _updateMapMarkers(state.locations);
+        builder: (context, locState) {
+          if (locState is LocationsLoaded) {
+            _updateLocationMarkers(locState.locations);
           }
-          return Stack(
-            children: [
-              GoogleMap(
-                initialCameraPosition: const CameraPosition(
-                  target: LatLng(
-                    AppConstants.mapDefaultLatitude,
-                    AppConstants.mapDefaultLongitude,
+          return BlocBuilder<ReportBloc, ReportState>(
+            builder: (context, rptState) {
+              if (rptState is ReportsLoaded) {
+                _updateReportMarkers(rptState.reports);
+              }
+              return Stack(
+                children: [
+                  GoogleMap(
+                    initialCameraPosition: const CameraPosition(
+                      target: LatLng(
+                        AppConstants.mapDefaultLatitude,
+                        AppConstants.mapDefaultLongitude,
+                      ),
+                      zoom: 12,
+                    ),
+                    markers: _markers,
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                    zoomControlsEnabled: true,
                   ),
-                  zoom: 12,
-                ),
-                onMapCreated: (controller) {
-                },
-                markers: _markers,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                zoomControlsEnabled: true,
-              ),
-              if (state is LocationLoading)
-                const Center(child: CircularProgressIndicator()),
-              Positioned(
-                bottom: 24,
-                right: 16,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    FloatingActionButton(
-                      heroTag: 'report',
-                      backgroundColor: Colors.red,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ReportIncidentPage(),
-                          ),
-                        );
-                      },
-                      child: const Icon(Icons.add, color: Colors.white),
+                  if (locState is LocationLoading || rptState is ReportLoading)
+                    const Center(child: CircularProgressIndicator()),
+                  Positioned(
+                    bottom: 24,
+                    right: 16,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FloatingActionButton(
+                          heroTag: 'report',
+                          backgroundColor: Colors.red,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ReportIncidentPage(),
+                              ),
+                            );
+                          },
+                          child: const Icon(Icons.add, color: Colors.white),
+                        ),
+                        const SizedBox(height: 8),
+                        FloatingActionButton(
+                          heroTag: 'alerts',
+                          mini: true,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AlertsPage(),
+                              ),
+                            );
+                          },
+                          child: const Icon(Icons.notifications_outlined),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    FloatingActionButton(
-                      heroTag: 'alerts',
-                      mini: true,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AlertsPage(),
-                          ),
-                        );
-                      },
-                      child: const Icon(Icons.notifications_outlined),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           );
         },
       ),
     );
   }
 
-  void _updateMapMarkers(List<Location> locations) {
-    _markers.clear();
+  void _updateLocationMarkers(List<Location> locations) {
+    _markers.removeWhere((m) => m.markerId.value.startsWith('loc_'));
     for (final loc in locations) {
-      final marker = Marker(
-        markerId: MarkerId(loc.id.toString()),
+      _markers.add(Marker(
+        markerId: MarkerId('loc_${loc.id}'),
         position: LatLng(loc.latitude, loc.longitude),
         icon: _getRiskMarkerIcon(loc.riskLevel),
         infoWindow: InfoWindow(
@@ -123,8 +123,30 @@ class _HomePageState extends State<HomePage> {
           snippet:
               'Riesgo: ${loc.riskCategory} - Incidentes: ${loc.incidentCount}',
         ),
-      );
-      _markers.add(marker);
+      ));
+    }
+  }
+
+  void _updateReportMarkers(List<IncidentReport> reports) {
+    _markers.removeWhere((m) => m.markerId.value.startsWith('rpt_'));
+    for (final r in reports) {
+      _markers.add(Marker(
+        markerId: MarkerId('rpt_${r.id}'),
+        position: LatLng(r.latitude, r.longitude),
+        icon: _getReportMarkerIcon(r.incidentType),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => IncidentDetailPage(report: r),
+            ),
+          );
+        },
+        infoWindow: InfoWindow(
+          title: r.title,
+          snippet: r.description,
+        ),
+      ));
     }
   }
 
@@ -139,6 +161,23 @@ class _HomePageState extends State<HomePage> {
         return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
       default:
         return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+    }
+  }
+
+  BitmapDescriptor _getReportMarkerIcon(String type) {
+    switch (type) {
+      case 'ROBBERY':
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
+      case 'ASSAULT':
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+      case 'HARASSMENT':
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+      case 'VANDALISM':
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
+      case 'ACCIDENT':
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+      default:
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose);
     }
   }
 }
