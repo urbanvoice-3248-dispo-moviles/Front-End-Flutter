@@ -135,7 +135,7 @@ class _ReportIncidentPageState extends State<ReportIncidentPage> {
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      initialValue: _selectedType,
+                      value: _selectedType,
                       decoration: const InputDecoration(
                         labelText: 'Tipo de incidente',
                         prefixIcon: Icon(Icons.category_outlined),
@@ -228,7 +228,7 @@ class _ReportIncidentPageState extends State<ReportIncidentPage> {
                       value: _isAnonymous,
                       onChanged: (value) =>
                           setState(() => _isAnonymous = value),
-                      secondary:                     const Icon(Icons.visibility_off),
+                      secondary: const Icon(Icons.visibility_off),
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton.icon(
