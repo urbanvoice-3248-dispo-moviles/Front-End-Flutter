@@ -37,15 +37,72 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
+      final age = int.tryParse(_ageController.text.trim());
+      if (age == null) return;
+
       context.read<AuthBloc>().add(RegisterEvent(
             name: _nameController.text.trim(),
             lastName: _lastNameController.text.trim(),
-            age: int.parse(_ageController.text.trim()),
+            age: age,
             email: _emailController.text.trim(),
             phoneNumber: _phoneController.text.trim(),
             password: _passwordController.text,
           ));
     }
+  }
+
+  String? _validateAge(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Ingrese su edad';
+    }
+
+    final age = int.tryParse(value.trim());
+    if (age == null) {
+      return 'Ingrese una edad valida';
+    }
+    if (age < 13) {
+      return 'La edad minima es 13';
+    }
+
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Ingrese su correo';
+    }
+
+    final email = value.trim();
+    final isValidEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+    if (!isValidEmail) {
+      return 'Ingrese un correo valido';
+    }
+
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Ingrese su telefono';
+    }
+
+    final digitsOnly = RegExp(r'^\d{7,15}$').hasMatch(value.trim());
+    if (!digitsOnly) {
+      return 'Ingrese un telefono valido';
+    }
+
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Confirme su contrasena';
+    }
+    if (value != _passwordController.text) {
+      return 'Las contrasenas no coinciden';
+    }
+
+    return null;
   }
 
   @override
@@ -107,12 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         labelText: 'Edad',
                         prefixIcon: Icon(Icons.numbers),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingrese su edad';
-                        }
-                        return null;
-                      },
+                      validator: _validateAge,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -122,12 +174,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         labelText: 'Correo electrónico',
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingrese su correo';
-                        }
-                        return null;
-                      },
+                      validator: _validateEmail,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -137,12 +184,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         labelText: 'Teléfono',
                         prefixIcon: Icon(Icons.phone_outlined),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingrese su teléfono';
-                        }
-                        return null;
-                      },
+                      validator: _validatePhone,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -177,12 +219,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         labelText: 'Confirmar contraseña',
                         prefixIcon: Icon(Icons.lock_outlined),
                       ),
-                      validator: (value) {
-                        if (value != _passwordController.text) {
-                          return 'Las contraseñas no coinciden';
-                        }
-                        return null;
-                      },
+                      validator: _validateConfirmPassword,
                     ),
                     const SizedBox(height: 8),
                     if (state is AuthError)
