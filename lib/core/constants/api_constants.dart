@@ -1,6 +1,15 @@
 import 'package:flutter/foundation.dart';
 
+/// Constantes relacionadas con la API REST del backend de UrbanVoice.
+///
+/// Centraliza la URL base (que varía según la plataforma) y las rutas
+/// relativas de cada recurso, evitando cadenas mágicas repartidas por el
+/// código.
 class ApiConstants {
+  /// URL base de la API según la plataforma de ejecución.
+  ///
+  /// En el emulador de Android se usa `10.0.2.2` para alcanzar el host;
+  /// en web y escritorio se usa `localhost`.
   static String get baseUrl {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
       return 'http://localhost:8080/api/v1';
