@@ -1,12 +1,8 @@
-import 'package:flutter/foundation.dart';
-
 class ApiConstants {
-  static String get baseUrl {
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) {
-      return 'http://localhost:8080/api/v1';
-    }
-    return 'http://10.0.2.2:8080/api/v1';
-  }
+  // Local (para pruebas):
+  // static const String baseUrl = 'http://localhost:8080/api/v1';
+  // static const String baseUrlAndroid = 'http://10.0.2.2:8080/api/v1';
+  static const String baseUrl = 'https://backend-urbanvoice.onrender.com/api/v1';
 
   static const String login = '/auth/login';
   static const String forgotPassword = '/auth/forgot-password';

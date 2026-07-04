@@ -33,6 +33,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       appBar: AppBar(title: const Text('Recuperar Contraseña')),
       body: BlocConsumer<ForgotPasswordBloc, ForgotPasswordState>(
         listener: (context, state) {
+          if (state is ForgotPasswordTokenSent) {
+            _tokenController.text = state.token;
+          }
           if (state is ForgotPasswordSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(

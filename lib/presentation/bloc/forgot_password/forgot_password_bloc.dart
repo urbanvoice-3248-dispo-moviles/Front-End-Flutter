@@ -25,7 +25,7 @@ class ForgotPasswordBloc
     final result = await forgotPassword(event.email);
     result.fold(
       (failure) => emit(ForgotPasswordError(failure.message)),
-      (_) => emit(ForgotPasswordTokenSent()),
+      (data) => emit(ForgotPasswordTokenSent(token: data['token'] as String)),
     );
   }
 
