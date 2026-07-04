@@ -40,6 +40,33 @@ class ReportDetailLoaded extends ReportState {
 
 class ReportDeleted extends ReportState {}
 
+class ReportVoteSuccess extends ReportState {
+  final VoteResponse vote;
+
+  const ReportVoteSuccess(this.vote);
+
+  @override
+  List<Object?> get props => [vote];
+}
+
+class ReportVoteLoaded extends ReportState {
+  final VoteResponse vote;
+
+  const ReportVoteLoaded(this.vote);
+
+  @override
+  List<Object?> get props => [vote];
+}
+
+class ReportVoteError extends ReportState {
+  final String message;
+
+  const ReportVoteError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class ReportError extends ReportState {
   final String message;
 

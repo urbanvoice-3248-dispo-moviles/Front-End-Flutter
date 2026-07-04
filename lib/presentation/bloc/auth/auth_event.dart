@@ -41,4 +41,8 @@ class LoginEvent extends AuthEvent {
 
 class CheckAuthEvent extends AuthEvent {}
 
+class CheckSavedSessionEvent extends AuthEvent {}
+
 class LogoutEvent extends AuthEvent {}
+
+class TermsAcceptedEvent extends AuthEvent {}

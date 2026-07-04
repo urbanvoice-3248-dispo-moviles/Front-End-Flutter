@@ -86,4 +86,28 @@ class DeleteReportEvent extends ReportEvent {
   List<Object?> get props => [id];
 }
 
+class ToggleVoteEvent extends ReportEvent {
+  final int reportId;
+  final String voteType;
+  final int userId;
+
+  const ToggleVoteEvent({
+    required this.reportId,
+    required this.voteType,
+    required this.userId,
+  });
+
+  @override
+  List<Object?> get props => [reportId, voteType, userId];
+}
+
+class GetVotesEvent extends ReportEvent {
+  final int reportId;
+
+  const GetVotesEvent(this.reportId);
+
+  @override
+  List<Object?> get props => [reportId];
+}
+
 class ClearReportErrorEvent extends ReportEvent {}

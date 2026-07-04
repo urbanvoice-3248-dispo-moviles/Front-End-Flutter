@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import '../constants/api_constants.dart';
+import 'token_manager.dart';
 
 class ApiClient {
   late final Dio _dio;
+  final TokenManager _tokenManager = TokenManager();
 
   ApiClient() {
     _dio = Dio(
@@ -16,6 +18,20 @@ class ApiClient {
         },
       ),
     );
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final token = await _tokenManager.getToken();
+        if (token != null && token.isNotEmpty) {
+          final isAuthEndpoint = options.path.contains('/auth/');
+          final isRegistration =
+              options.path.contains('/profiles') && options.method == 'POST';
+          if (!isAuthEndpoint && !isRegistration) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+        }
+        handler.next(options);
+      },
+    ));
   }
 
   Future<Response> get(

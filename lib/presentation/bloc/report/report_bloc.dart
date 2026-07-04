@@ -2,7 +2,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/incident_report.dart';
+import '../../../domain/entities/vote.dart';
 import '../../../domain/usecases/create_report.dart';
+import '../../../domain/usecases/vote_usecases.dart';
 
 part 'report_event.dart';
 part 'report_state.dart';
@@ -13,6 +15,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   final GetReportsByUser getReportsByUser;
   final GetNearbyReports getNearbyReports;
   final DeleteReport deleteReport;
+  final ToggleVote toggleVote;
+  final GetVotes getVotes;
 
   ReportBloc({
     required this.createReport,
@@ -20,12 +24,16 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     required this.getReportsByUser,
     required this.getNearbyReports,
     required this.deleteReport,
+    required this.toggleVote,
+    required this.getVotes,
   }) : super(ReportInitial()) {
     on<CreateReportEvent>(_onCreateReport);
     on<GetReportsByUserEvent>(_onGetReportsByUser);
     on<GetNearbyReportsEvent>(_onGetNearbyReports);
     on<GetReportByIdEvent>(_onGetReportById);
     on<DeleteReportEvent>(_onDeleteReport);
+    on<ToggleVoteEvent>(_onToggleVote);
+    on<GetVotesEvent>(_onGetVotes);
     on<ClearReportErrorEvent>(_onClearError);
   }
 
@@ -92,7 +100,29 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     );
   }
 
-  void _onClearError(ClearReportErrorEvent event, Emitter<ReportState> emit) {
-    emit(ReportInitial());
+  Future<void> _onToggleVote(
+      ToggleVoteEvent event, Emitter<ReportState> emit) async {
+    final result =
+        await toggleVote(event.reportId, event.voteType, event.userId);
+    result.fold(
+      (failure) => emit(ReportVoteError(failure.message)),
+      (vote) => emit(ReportVoteSuccess(vote)),
+    );
+  }
+
+  Future<void> _onGetVotes(
+      GetVotesEvent event, Emitter<ReportState> emit) async {
+    final result = await getVotes(event.reportId);
+    result.fold(
+      (failure) => emit(ReportVoteError(failure.message)),
+      (vote) => emit(ReportVoteLoaded(vote)),
+    );
+  }
+
+  void _onClearError(
+      ClearReportErrorEvent event, Emitter<ReportState> emit) {
+    if (state is ReportError) {
+      emit(ReportInitial());
+    }
   }
 }
