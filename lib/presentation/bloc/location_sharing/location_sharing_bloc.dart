@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/entities/share_session.dart';
-import '../../../domain/entities/user_profile.dart';
+
 import '../../../domain/usecases/location_sharing_usecases.dart';
 import '../../../domain/usecases/profile_usecases.dart';
 
@@ -27,7 +27,7 @@ class LocationSharingBloc
     required this.getMyShares,
     required this.getSharedWithMe,
     required this.getProfileByEmail,
-  }) : super(LocationSharingInitial()) {
+  }) : super(const LocationSharingInitial()) {
     on<PublishMyLocationEvent>(_onPublish);
     on<LoadSharingDataEvent>(_onLoadData);
     on<StartSharingEvent>(_onStartSharing);
@@ -51,7 +51,7 @@ class LocationSharingBloc
 
   Future<void> _onLoadData(
       LoadSharingDataEvent event, Emitter<LocationSharingState> emit) async {
-    emit(LocationSharingLoading());
+    emit(const LocationSharingLoading());
     final sharesResult = await getMyShares(event.userId);
     final sharedResult = await getSharedWithMe(event.userId);
 
@@ -83,7 +83,7 @@ class LocationSharingBloc
 
   Future<void> _onStartSharing(
       StartSharingEvent event, Emitter<LocationSharingState> emit) async {
-    emit(LocationSharingLoading());
+    emit(const LocationSharingLoading());
     if (state.myShares.length >= 5) {
       emit(state.copyWith(
           addContactError: 'Máximo 5 contactos permitidos'));

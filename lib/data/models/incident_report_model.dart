@@ -12,6 +12,7 @@ class IncidentReportModel {
   final String? mediaUrl;
   final bool isAnonymous;
   final DateTime reportedAt;
+  final String status;
 
   const IncidentReportModel({
     required this.id,
@@ -25,6 +26,7 @@ class IncidentReportModel {
     this.mediaUrl,
     required this.isAnonymous,
     required this.reportedAt,
+    this.status = 'PENDING',
   });
 
   factory IncidentReportModel.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,7 @@ class IncidentReportModel {
       mediaUrl: json['media_url'] as String?,
       isAnonymous: json['is_anonymous'] as bool? ?? false,
       reportedAt: DateTime.parse(json['reported_at'] as String),
+      status: json['status'] as String? ?? 'PENDING',
     );
   }
 
@@ -56,6 +59,7 @@ class IncidentReportModel {
       'media_url': mediaUrl,
       'is_anonymous': isAnonymous,
       'reported_at': reportedAt.toIso8601String(),
+      'status': status,
     };
   }
 
@@ -72,6 +76,7 @@ class IncidentReportModel {
       mediaUrl: mediaUrl,
       isAnonymous: isAnonymous,
       reportedAt: reportedAt,
+      status: status,
     );
   }
 }

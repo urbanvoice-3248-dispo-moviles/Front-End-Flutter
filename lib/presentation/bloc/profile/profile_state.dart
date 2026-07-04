@@ -13,11 +13,12 @@ class ProfileLoading extends ProfileState {}
 
 class ProfileLoaded extends ProfileState {
   final UserProfile profile;
+  final AlertConfig? alertConfig;
 
-  const ProfileLoaded(this.profile);
+  const ProfileLoaded(this.profile, {this.alertConfig});
 
   @override
-  List<Object?> get props => [profile];
+  List<Object?> get props => [profile, alertConfig];
 }
 
 class ProfileDeleted extends ProfileState {}

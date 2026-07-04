@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/auth/auth_bloc.dart';
 import '../widgets/loading_overlay.dart';
-import 'home_page.dart';
+import 'terms_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -57,7 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
           if (state is AuthAuthenticated) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const HomePage()),
+              MaterialPageRoute(builder: (_) => const TermsPage()),
               (route) => false,
             );
           }
@@ -111,6 +111,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         if (value == null || value.isEmpty) {
                           return 'Ingrese su edad';
                         }
+                        final age = int.tryParse(value);
+                        if (age == null || age <= 0) {
+                          return 'Edad inválida';
+                        }
                         return null;
                       },
                     ),
@@ -125,6 +129,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Ingrese su correo';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Correo inválido';
                         }
                         return null;
                       },

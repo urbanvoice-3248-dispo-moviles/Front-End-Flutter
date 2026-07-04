@@ -8,6 +8,7 @@ class UserProfileModel {
   final String email;
   final String phoneNumber;
   final String? profileImageUrl;
+  final String role;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -19,6 +20,7 @@ class UserProfileModel {
     required this.email,
     required this.phoneNumber,
     this.profileImageUrl,
+    this.role = 'USER',
     required this.createdAt,
     required this.updatedAt,
   });
@@ -32,6 +34,7 @@ class UserProfileModel {
       email: json['email'] as String,
       phoneNumber: json['phone_number'] as String,
       profileImageUrl: json['profile_image_url'] as String?,
+      role: json['role'] as String? ?? 'USER',
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
@@ -46,6 +49,7 @@ class UserProfileModel {
       'email': email,
       'phone_number': phoneNumber,
       'profile_image_url': profileImageUrl,
+      'role': role,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -60,6 +64,7 @@ class UserProfileModel {
       email: email,
       phoneNumber: phoneNumber,
       profileImageUrl: profileImageUrl,
+      role: role,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

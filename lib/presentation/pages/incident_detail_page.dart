@@ -1,16 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../domain/entities/incident_report.dart';
+import '../bloc/auth/auth_bloc.dart';
+import '../bloc/report/report_bloc.dart';
 
-class IncidentDetailPage extends StatelessWidget {
+class IncidentDetailPage extends StatefulWidget {
   final IncidentReport report;
 
   const IncidentDetailPage({super.key, required this.report});
 
   @override
+  State<IncidentDetailPage> createState() => _IncidentDetailPageState();
+}
+
+class _IncidentDetailPageState extends State<IncidentDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ReportBloc>().add(GetVotesEvent(widget.report.id));
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final report = widget.report;
+    final authState = context.watch<AuthBloc>().state;
+    final isModerator =
+        authState is AuthAuthenticated && authState.profile.isModerator;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Detalle del Incidente')),
       body: SingleChildScrollView(
@@ -59,15 +78,25 @@ class IncidentDetailPage extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Chip(
-                    label: Text(report.incidentType),
-                    backgroundColor: Colors.red[100],
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      Chip(
+                        label: Text(_translateType(report.incidentType)),
+                        backgroundColor: Colors.red[100],
+                      ),
+                      Chip(
+                        label: Text(_translateStatus(report.status)),
+                        backgroundColor: _getStatusColor(report.status)
+                            .withValues(alpha: 0.2),
+                      ),
+                      if (report.isAnonymous)
+                        const Chip(
+                          label: Text('Anónimo'),
+                          backgroundColor: Colors.grey,
+                        ),
+                    ],
                   ),
-                  if (report.isAnonymous)
-                    const Chip(
-                      label: Text('Reporte Anónimo'),
-                      backgroundColor: Colors.grey,
-                    ),
                   const SizedBox(height: 16),
                   Text(
                     report.description,
@@ -106,8 +135,71 @@ class IncidentDetailPage extends StatelessWidget {
                       height: 200,
                       color: Colors.grey[200],
                       child: const Center(
-                        child: Icon(Icons.image, size: 64, color: Colors.grey),
+                        child:
+                            Icon(Icons.image, size: 64, color: Colors.grey),
                       ),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  BlocBuilder<ReportBloc, ReportState>(
+                    builder: (context, state) {
+                      int upvotes = 0;
+                      int downvotes = 0;
+                      if (state is ReportVoteLoaded) {
+                        upvotes = state.vote.upvotes;
+                        downvotes = state.vote.downvotes;
+                      }
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildVoteButton(
+                            context,
+                            Icons.thumb_up,
+                            'Útil ($upvotes)',
+                            Colors.green,
+                            () => _handleVote('UPVOTE'),
+                          ),
+                          _buildVoteButton(
+                            context,
+                            Icons.thumb_down,
+                            'No útil ($downvotes)',
+                            Colors.red,
+                            () => _handleVote('DOWNVOTE'),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  if (isModerator && report.status == 'PENDING') ...[
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () =>
+                                _handleModerate('APPROVE'),
+                            icon: const Icon(Icons.check),
+                            label: const Text('Aprobar'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () =>
+                                _handleModerate('REJECT'),
+                            icon: const Icon(Icons.close),
+                            label: const Text('Rechazar'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ],
@@ -117,6 +209,29 @@ class IncidentDetailPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildVoteButton(BuildContext context, IconData icon, String label,
+      Color color, VoidCallback onPressed) {
+    return TextButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, color: color),
+      label: Text(label, style: TextStyle(color: color)),
+    );
+  }
+
+  void _handleVote(String voteType) {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      context.read<ReportBloc>().add(ToggleVoteEvent(
+            reportId: widget.report.id,
+            voteType: voteType,
+            userId: authState.profile.id,
+          ));
+    }
+  }
+
+  void _handleModerate(String action) {
   }
 
   IconData _getIncidentIcon(String type) {
@@ -133,6 +248,47 @@ class IncidentDetailPage extends StatelessWidget {
         return Icons.car_crash;
       default:
         return Icons.report_problem;
+    }
+  }
+
+  String _translateType(String type) {
+    switch (type) {
+      case 'ROBBERY':
+        return 'Robo';
+      case 'ASSAULT':
+        return 'Asalto';
+      case 'HARASSMENT':
+        return 'Acoso';
+      case 'VANDALISM':
+        return 'Vandalismo';
+      case 'ACCIDENT':
+        return 'Accidente';
+      default:
+        return type;
+    }
+  }
+
+  String _translateStatus(String status) {
+    switch (status) {
+      case 'PENDING':
+        return 'Pendiente';
+      case 'APPROVED':
+        return 'Aprobado';
+      case 'REJECTED':
+        return 'Rechazado';
+      default:
+        return status;
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'APPROVED':
+        return Colors.green;
+      case 'REJECTED':
+        return Colors.red;
+      default:
+        return Colors.orange;
     }
   }
 }

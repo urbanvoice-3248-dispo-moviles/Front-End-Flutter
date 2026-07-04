@@ -3,9 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/auth/auth_bloc.dart';
 import '../pages/alerts_page.dart';
+import '../pages/category_management_page.dart';
+import '../pages/location_sharing_page.dart';
 import '../pages/my_reports_page.dart';
 import '../pages/profile_page.dart';
 import '../pages/report_incident_page.dart';
+import '../pages/safe_route_page.dart';
+import '../pages/statistics_page.dart';
 import '../pages/login_page.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -88,6 +92,32 @@ class AppDrawer extends StatelessWidget {
                   );
                 },
               ),
+              ListTile(
+                leading: const Icon(Icons.share_location),
+                title: const Text('Compartir Ubicación'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LocationSharingPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.route),
+                title: const Text('Ruta Segura'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SafeRoutePage(),
+                    ),
+                  );
+                },
+              ),
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.person),
@@ -98,6 +128,32 @@ class AppDrawer extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => const ProfilePage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.category),
+                title: const Text('Categorías'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const CategoryManagementPage(),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.bar_chart),
+                title: const Text('Estadísticas'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const StatisticsPage(),
                     ),
                   );
                 },

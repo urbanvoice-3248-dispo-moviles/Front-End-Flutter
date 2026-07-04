@@ -21,6 +21,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final Set<Marker> _markers = {};
+  final Set<Polygon> _polygons = {};
+  bool _showRiskMap = false;
 
   @override
   void initState() {
@@ -37,6 +39,16 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('UrbanVoice'),
+        actions: [
+          IconButton(
+            icon: Icon(_showRiskMap
+                ? Icons.layers_clear
+                : Icons.layers),
+            tooltip: 'Mapa de Riesgo',
+            onPressed: () =>
+                setState(() => _showRiskMap = !_showRiskMap),
+          ),
+        ],
       ),
       drawer: const AppDrawer(),
       body: BlocBuilder<LocationBloc, LocationState>(
@@ -60,11 +72,13 @@ class _HomePageState extends State<HomePage> {
                       zoom: 12,
                     ),
                     markers: _markers,
+                    polygons: _showRiskMap ? _polygons : {},
                     myLocationEnabled: true,
                     myLocationButtonEnabled: true,
                     zoomControlsEnabled: true,
                   ),
-                  if (locState is LocationLoading || rptState is ReportLoading)
+                  if (locState is LocationLoading ||
+                      rptState is ReportLoading)
                     const Center(child: CircularProgressIndicator()),
                   Positioned(
                     bottom: 24,
@@ -79,11 +93,13 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => const ReportIncidentPage(),
+                                builder: (_) =>
+                                    const ReportIncidentPage(),
                               ),
                             );
                           },
-                          child: const Icon(Icons.add, color: Colors.white),
+                          child: const Icon(Icons.add,
+                              color: Colors.white),
                         ),
                         const SizedBox(height: 8),
                         FloatingActionButton(
@@ -97,16 +113,61 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           },
-                          child: const Icon(Icons.notifications_outlined),
+                          child: const Icon(
+                              Icons.notifications_outlined),
                         ),
                       ],
                     ),
                   ),
+                  if (_showRiskMap)
+                    Positioned(
+                      top: 16,
+                      left: 16,
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              _legendItem(
+                                  Colors.red, 'Alto riesgo'),
+                              _legendItem(Colors.orange,
+                                  'Riesgo medio'),
+                              _legendItem(Colors.yellow,
+                                  'Riesgo bajo'),
+                              _legendItem(
+                                  Colors.green, 'Zona segura'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               );
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _legendItem(Color color, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.5),
+              border: Border.all(color: color),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(label, style: const TextStyle(fontSize: 12)),
+        ],
       ),
     );
   }
@@ -154,30 +215,40 @@ class _HomePageState extends State<HomePage> {
     switch (riskLevel) {
       case 4:
       case 5:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueRed);
       case 3:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueOrange);
       case 2:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueYellow);
       default:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueGreen);
     }
   }
 
   BitmapDescriptor _getReportMarkerIcon(String type) {
     switch (type) {
       case 'ROBBERY':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueViolet);
       case 'ASSAULT':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueRed);
       case 'HARASSMENT':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueOrange);
       case 'VANDALISM':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueCyan);
       case 'ACCIDENT':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueBlue);
       default:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose);
+        return BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueRose);
     }
   }
 }

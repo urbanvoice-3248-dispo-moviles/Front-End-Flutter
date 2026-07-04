@@ -62,7 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final userId = data['user_id'] as int;
         final profileResult = await getProfileById(userId);
         profileResult.fold(
-          (failure) => emit(AuthError('Error al cargar perfil')),
+          (failure) => emit(const AuthError('Error al cargar perfil')),
           (profile) async {
             final termsAccepted = await tokenManager.getTermsAccepted();
             emit(AuthAuthenticated(profile,

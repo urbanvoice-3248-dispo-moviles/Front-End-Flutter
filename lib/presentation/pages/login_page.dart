@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/auth/auth_bloc.dart';
 import '../widgets/loading_overlay.dart';
+import 'forgot_password_page.dart';
 import 'home_page.dart';
 import 'register_page.dart';
+import 'terms_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -41,12 +43,21 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const HomePage(),
-              ),
-            );
+            if (state.needsTermsAcceptance) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const TermsPage(),
+                ),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HomePage(),
+                ),
+              );
+            }
           }
         },
         builder: (context, state) {
@@ -107,8 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             labelText: 'Contraseña',
-                            prefixIcon:
-                                const Icon(Icons.lock_outlined),
+                            prefixIcon: const Icon(Icons.lock_outlined),
                             suffixIcon: IconButton(
                               icon: Icon(_obscurePassword
                                   ? Icons.visibility_off
@@ -154,11 +164,25 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
+                                builder: (_) =>
+                                    const ForgotPasswordPage(),
+                              ),
+                            );
+                          },
+                          child: const Text('¿Olvidaste tu contraseña?'),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
                                 builder: (_) => const RegisterPage(),
                               ),
                             );
                           },
-                          child: const Text('¿No tienes cuenta? Regístrate'),
+                          child: const Text(
+                              '¿No tienes cuenta? Regístrate'),
                         ),
                       ],
                     ),

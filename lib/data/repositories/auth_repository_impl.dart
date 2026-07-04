@@ -5,6 +5,7 @@ import '../../core/errors/failures.dart';
 import '../../core/network/token_manager.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
+import '../models/auth_models.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
@@ -75,12 +76,4 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
-}
-
-// Needed for the login request
-class LoginRequest {
-  final String email;
-  final String password;
-  const LoginRequest({required this.email, required this.password});
-  Map<String, dynamic> toJson() => {'email': email, 'password': password};
 }

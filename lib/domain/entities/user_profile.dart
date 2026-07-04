@@ -8,6 +8,7 @@ class UserProfile extends Equatable {
   final String email;
   final String phoneNumber;
   final String? profileImageUrl;
+  final String role;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -19,9 +20,12 @@ class UserProfile extends Equatable {
     required this.email,
     required this.phoneNumber,
     this.profileImageUrl,
+    this.role = 'USER',
     required this.createdAt,
     required this.updatedAt,
   });
+
+  bool get isModerator => role == 'MODERATOR';
 
   @override
   List<Object?> get props => [
@@ -32,6 +36,7 @@ class UserProfile extends Equatable {
         email,
         phoneNumber,
         profileImageUrl,
+        role,
         createdAt,
         updatedAt,
       ];

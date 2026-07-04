@@ -12,6 +12,7 @@ class IncidentReport extends Equatable {
   final String? mediaUrl;
   final bool isAnonymous;
   final DateTime reportedAt;
+  final String status;
 
   const IncidentReport({
     required this.id,
@@ -25,6 +26,7 @@ class IncidentReport extends Equatable {
     this.mediaUrl,
     required this.isAnonymous,
     required this.reportedAt,
+    this.status = 'PENDING',
   });
 
   @override
@@ -40,5 +42,6 @@ class IncidentReport extends Equatable {
         mediaUrl,
         isAnonymous,
         reportedAt,
+        status,
       ];
 }

@@ -43,3 +43,29 @@ class DeleteProfileEvent extends ProfileEvent {
   @override
   List<Object?> get props => [id];
 }
+
+class GetAlertConfigEvent extends ProfileEvent {
+  final int userId;
+
+  const GetAlertConfigEvent(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}
+
+class UpdateAlertConfigEvent extends ProfileEvent {
+  final int userId;
+  final bool? enabled;
+  final double? radiusInKm;
+  final bool? notifyByEmail;
+
+  const UpdateAlertConfigEvent({
+    required this.userId,
+    this.enabled,
+    this.radiusInKm,
+    this.notifyByEmail,
+  });
+
+  @override
+  List<Object?> get props => [userId, enabled, radiusInKm, notifyByEmail];
+}
