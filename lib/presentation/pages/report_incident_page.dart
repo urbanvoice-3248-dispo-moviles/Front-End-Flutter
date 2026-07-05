@@ -25,6 +25,7 @@ class _ReportIncidentPageState extends State<ReportIncidentPage> {
   double? _longitude;
   String? _address;
   String? _mediaUrl;
+  bool _locationLoading = true;
 
   final List<Map<String, String>> _incidentTypes = [
     {'value': 'ROBBERY', 'label': 'Robo'},
@@ -42,14 +43,54 @@ class _ReportIncidentPageState extends State<ReportIncidentPage> {
   }
 
   Future<void> _getCurrentLocation() async {
-    final permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) return;
+    setState(() => _locationLoading = true);
+    try {
+      final permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Permiso de ubicación denegado')),
+          );
+        }
+        setState(() => _locationLoading = false);
+        return;
+      }
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Permiso de ubicación denegado permanentemente. Actívalo en Ajustes.')),
+          );
+        }
+        setState(() => _locationLoading = false);
+        return;
+      }
 
-    final position = await Geolocator.getCurrentPosition();
-    setState(() {
-      _latitude = position.latitude;
-      _longitude = position.longitude;
-    });
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: const Duration(seconds: 15),
+      );
+      if (mounted) {
+        setState(() {
+          _latitude = position.latitude;
+          _longitude = position.longitude;
+          _locationLoading = false;
+        });
+      }
+    } on LocationServiceDisabledException {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Activa el GPS para obtener tu ubicación')),
+        );
+      }
+      if (mounted) setState(() => _locationLoading = false);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al obtener ubicación. Intenta manualmente.')),
+        );
+      }
+      if (mounted) setState(() => _locationLoading = false);
+    }
   }
 
   Future<void> _pickMedia() async {
@@ -188,19 +229,27 @@ class _ReportIncidentPageState extends State<ReportIncidentPage> {
                           child: Text(
                             _latitude != null
                                 ? 'Ubicación capturada'
-                                : 'Obteniendo ubicación...',
+                                : _locationLoading
+                                    ? 'Obteniendo ubicación...'
+                                    : 'Ubicación no disponible',
                             style: TextStyle(
                               color: _latitude != null
                                   ? Colors.green
-                                  : Colors.grey,
+                                  : Colors.red,
                             ),
                           ),
                         ),
-                        if (_latitude == null)
+                        if (_locationLoading)
                           const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        if (!_locationLoading && _latitude == null)
+                          TextButton.icon(
+                            onPressed: _getCurrentLocation,
+                            icon: const Icon(Icons.refresh, size: 18),
+                            label: const Text('Reintentar'),
                           ),
                       ],
                     ),

@@ -3,17 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/auth/auth_bloc.dart';
 import '../pages/alerts_page.dart';
-import '../pages/category_management_page.dart';
 import '../pages/location_sharing_page.dart';
 import '../pages/my_reports_page.dart';
 import '../pages/profile_page.dart';
 import '../pages/report_incident_page.dart';
 import '../pages/safe_route_page.dart';
-import '../pages/statistics_page.dart';
 import '../pages/login_page.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  final VoidCallback? onToggleRiskMap;
+
+  const AppDrawer({super.key, this.onToggleRiskMap});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class AppDrawer extends StatelessWidget {
               ListTile(
                 leading: const Icon(Icons.map),
                 title: const Text('Mapa de Riesgo'),
-                onTap: () => Navigator.pop(context),
+                onTap: () => onToggleRiskMap?.call(),
               ),
               ListTile(
                 leading: const Icon(Icons.add_circle, color: Colors.red),
@@ -132,32 +132,7 @@ class AppDrawer extends StatelessWidget {
                   );
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.category),
-                title: const Text('Categorías'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const CategoryManagementPage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.bar_chart),
-                title: const Text('Estadísticas'),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const StatisticsPage(),
-                    ),
-                  );
-                },
-              ),
+
               if (profile != null)
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),

@@ -56,17 +56,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       LoginEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     final result = await loginUser(event.email, event.password);
-    result.fold(
-      (failure) => emit(AuthError(_mapFailureMessage(failure.message, 'login'))),
-      (data) async {
-        final userId = data['user_id'] as int;
-        final profileResult = await getProfileById(userId);
-        profileResult.fold(
-          (failure) => emit(const AuthError('Error al cargar perfil')),
-          (profile) {
-            emit(AuthAuthenticated(profile));
-          },
-        );
+    final failure = result.fold(
+      (failure) => failure,
+      (_) => null,
+    );
+    if (failure != null) {
+      emit(AuthError(_mapFailureMessage(failure.message, 'login')));
+      return;
+    }
+    final data = result.getOrElse(() => throw 'unreachable');
+    final userId = data['user_id'] as int;
+    final profileResult = await getProfileById(userId);
+    profileResult.fold(
+      (failure) => emit(const AuthError('Error al cargar perfil')),
+      (profile) {
+        emit(AuthAuthenticated(profile));
       },
     );
   }
@@ -101,15 +105,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final userId = await tokenManager.getUserId();
       if (userId != null) {
         final profileResult = await getProfileById(userId);
-        profileResult.fold(
-          (_) async {
-            await tokenManager.clearSession();
-            emit(AuthInitial());
-          },
-          (profile) {
-            emit(AuthAuthenticated(profile));
-          },
+        final fetchFailure = profileResult.fold(
+          (failure) => failure,
+          (_) => null,
         );
+        if (fetchFailure != null) {
+          await tokenManager.clearSession();
+          emit(AuthInitial());
+          return;
+        }
+        final profile = profileResult.getOrElse(() => throw 'unreachable');
+        emit(AuthAuthenticated(profile));
       } else {
         emit(AuthInitial());
       }
