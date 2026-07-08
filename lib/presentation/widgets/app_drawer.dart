@@ -8,6 +8,10 @@ import '../pages/profile_page.dart';
 import '../pages/report_incident_page.dart';
 import '../pages/login_page.dart';
 
+/// Menu lateral compartido para las rutas principales de la aplicacion.
+///
+/// Lee el estado de autenticacion para mostrar datos del perfil cuando existe
+/// una sesion activa y para habilitar la opcion de cierre de sesion.
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -16,6 +20,8 @@ class AppDrawer extends StatelessWidget {
     return Drawer(
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
+          // El drawer tambien funciona para visitantes; por eso el perfil se
+          // trata como opcional en todos los campos visibles.
           final profile =
               state is AuthAuthenticated ? state.profile : null;
           return ListView(
@@ -108,6 +114,7 @@ class AppDrawer extends StatelessWidget {
                   title: const Text('Cerrar Sesión'),
                   onTap: () {
                     Navigator.pop(context);
+                    // Borra la sesion antes de reiniciar la navegacion en login.
                     context.read<AuthBloc>().add(LogoutEvent());
                     Navigator.pushAndRemoveUntil(
                       context,
