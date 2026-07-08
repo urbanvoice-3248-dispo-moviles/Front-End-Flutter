@@ -12,6 +12,10 @@ import 'alerts_page.dart';
 import 'incident_detail_page.dart';
 import 'report_incident_page.dart';
 
+/// Pantalla principal de UrbanVoice con el mapa de riesgo ciudadano.
+///
+/// Combina ubicaciones de riesgo e incidentes cercanos en una misma capa de
+/// marcadores para que el usuario pueda explorar la situacion de su zona.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -20,11 +24,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  /// Marcadores activos del mapa.
+  ///
+  /// Se reutiliza el mismo conjunto para conservar las capas de ubicaciones e
+  /// incidentes, actualizando solo el prefijo que corresponde a cada origen.
   final Set<Marker> _markers = {};
 
   @override
   void initState() {
     super.initState();
+    // Carga inicial del mapa: zonas registradas y reportes cercanos al centro
+    // configurado para la ciudad.
     context.read<LocationBloc>().add(GetAllLocationsEvent());
     context.read<ReportBloc>().add(const GetNearbyReportsEvent(
           latitude: AppConstants.mapDefaultLatitude,
@@ -111,6 +121,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  /// Sincroniza los marcadores de zonas de riesgo sin tocar los reportes.
   void _updateLocationMarkers(List<Location> locations) {
     _markers.removeWhere((m) => m.markerId.value.startsWith('loc_'));
     for (final loc in locations) {
@@ -127,6 +138,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// Sincroniza los marcadores de reportes e incluye la navegacion al detalle.
   void _updateReportMarkers(List<IncidentReport> reports) {
     _markers.removeWhere((m) => m.markerId.value.startsWith('rpt_'));
     for (final r in reports) {
@@ -150,6 +162,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// Traduce el nivel de riesgo de una zona a un color de marcador.
   BitmapDescriptor _getRiskMarkerIcon(int riskLevel) {
     switch (riskLevel) {
       case 4:
@@ -164,6 +177,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// Asigna colores distintos por tipo de incidente para facilitar lectura.
   BitmapDescriptor _getReportMarkerIcon(String type) {
     switch (type) {
       case 'ROBBERY':
