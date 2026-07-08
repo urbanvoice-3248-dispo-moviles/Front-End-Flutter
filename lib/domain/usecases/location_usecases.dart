@@ -3,6 +3,7 @@ import '../entities/location.dart';
 import '../repositories/location_repository.dart';
 import '../../core/errors/failures.dart';
 
+/// Obtiene todas las ubicaciones de riesgo disponibles para el mapa.
 class GetAllLocations {
   final LocationRepository repository;
 
@@ -13,6 +14,7 @@ class GetAllLocations {
   }
 }
 
+/// Busca ubicaciones dentro de un radio alrededor de una coordenada.
 class GetNearbyLocations {
   final LocationRepository repository;
 
@@ -31,6 +33,7 @@ class GetNearbyLocations {
   }
 }
 
+/// Filtra ubicaciones por distrito para vistas o busquedas localizadas.
 class GetLocationsByDistrict {
   final LocationRepository repository;
 
@@ -41,6 +44,7 @@ class GetLocationsByDistrict {
   }
 }
 
+/// Obtiene zonas consideradas peligrosas desde un nivel minimo de riesgo.
 class GetDangerousLocations {
   final LocationRepository repository;
 
