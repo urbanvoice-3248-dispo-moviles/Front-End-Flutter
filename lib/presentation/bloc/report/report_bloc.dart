@@ -7,6 +7,10 @@ import '../../../domain/usecases/create_report.dart';
 part 'report_event.dart';
 part 'report_state.dart';
 
+/// Gestiona el flujo de reportes ciudadanos desde la interfaz.
+///
+/// Centraliza creacion, consulta, listado cercano y eliminacion para que las
+/// pantallas trabajen con estados consistentes.
 class ReportBloc extends Bloc<ReportEvent, ReportState> {
   final CreateReport createReport;
   final GetReportById getReportById;
@@ -29,6 +33,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<ClearReportErrorEvent>(_onClearError);
   }
 
+  /// Crea un reporte con los datos capturados desde el formulario.
   Future<void> _onCreateReport(
       CreateReportEvent event, Emitter<ReportState> emit) async {
     emit(ReportLoading());
@@ -49,6 +54,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     );
   }
 
+  /// Obtiene los reportes registrados por un usuario.
   Future<void> _onGetReportsByUser(
       GetReportsByUserEvent event, Emitter<ReportState> emit) async {
     emit(ReportLoading());
@@ -59,6 +65,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     );
   }
 
+  /// Obtiene reportes dentro del radio usado por el mapa principal.
   Future<void> _onGetNearbyReports(
       GetNearbyReportsEvent event, Emitter<ReportState> emit) async {
     emit(ReportLoading());
@@ -73,6 +80,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     );
   }
 
+  /// Recupera un reporte puntual para mostrar su detalle.
   Future<void> _onGetReportById(
       GetReportByIdEvent event, Emitter<ReportState> emit) async {
     emit(ReportLoading());
@@ -83,6 +91,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     );
   }
 
+  /// Elimina un reporte y emite el estado que permite refrescar la UI.
   Future<void> _onDeleteReport(
       DeleteReportEvent event, Emitter<ReportState> emit) async {
     final result = await deleteReport(event.id);
@@ -92,6 +101,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     );
   }
 
+  /// Limpia errores visibles y vuelve el flujo a su estado inicial.
   void _onClearError(ClearReportErrorEvent event, Emitter<ReportState> emit) {
     emit(ReportInitial());
   }

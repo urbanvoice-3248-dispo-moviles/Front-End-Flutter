@@ -7,6 +7,11 @@ import '../../../domain/usecases/location_usecases.dart';
 part 'location_event.dart';
 part 'location_state.dart';
 
+/// Orquesta las consultas de ubicaciones que alimentan el mapa de riesgo.
+///
+/// Cada evento delega en un caso de uso de dominio y transforma el resultado
+/// en estados simples para que la capa de presentacion solo reaccione a datos,
+/// carga o error.
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
   final GetAllLocations getAllLocations;
   final GetNearbyLocations getNearbyLocations;
@@ -25,6 +30,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     on<GetDangerousLocationsEvent>(_onGetDangerous);
   }
 
+  /// Carga todas las ubicaciones disponibles sin aplicar filtros.
   Future<void> _onGetAll(
       GetAllLocationsEvent event, Emitter<LocationState> emit) async {
     emit(LocationLoading());
@@ -35,6 +41,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     );
   }
 
+  /// Carga ubicaciones cercanas a una coordenada y radio determinados.
   Future<void> _onGetNearby(
       GetNearbyLocationsEvent event, Emitter<LocationState> emit) async {
     emit(LocationLoading());
@@ -49,6 +56,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     );
   }
 
+  /// Carga ubicaciones pertenecientes a un distrito especifico.
   Future<void> _onGetByDistrict(
       GetLocationsByDistrictEvent event, Emitter<LocationState> emit) async {
     emit(LocationLoading());
@@ -59,6 +67,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     );
   }
 
+  /// Carga ubicaciones que superan el nivel minimo de riesgo solicitado.
   Future<void> _onGetDangerous(
       GetDangerousLocationsEvent event, Emitter<LocationState> emit) async {
     emit(LocationLoading());

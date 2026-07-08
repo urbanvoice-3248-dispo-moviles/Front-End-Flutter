@@ -12,12 +12,18 @@ import 'presentation/bloc/report/report_bloc.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/pages/login_page.dart';
 
+/// Punto de entrada de la aplicacion.
+///
+/// Inicializa Flutter y el contenedor de dependencias antes de montar el arbol
+/// principal de widgets.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDependencies();
   runApp(const UrbanVoiceApp());
 }
 
+/// Widget raiz encargado de registrar los BLoCs globales y resolver la primera
+/// pantalla segun el estado de autenticacion.
 class UrbanVoiceApp extends StatelessWidget {
   const UrbanVoiceApp({super.key});
 
