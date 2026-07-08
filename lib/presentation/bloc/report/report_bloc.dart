@@ -15,6 +15,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   final GetReportsByUser getReportsByUser;
   final GetNearbyReports getNearbyReports;
   final DeleteReport deleteReport;
+  final ApproveReport approveReport;
+  final RejectReport rejectReport;
   final ToggleVote toggleVote;
   final GetVotes getVotes;
 
@@ -24,6 +26,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     required this.getReportsByUser,
     required this.getNearbyReports,
     required this.deleteReport,
+    required this.approveReport,
+    required this.rejectReport,
     required this.toggleVote,
     required this.getVotes,
   }) : super(ReportInitial()) {
@@ -32,6 +36,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<GetNearbyReportsEvent>(_onGetNearbyReports);
     on<GetReportByIdEvent>(_onGetReportById);
     on<DeleteReportEvent>(_onDeleteReport);
+    on<ApproveReportEvent>(_onApproveReport);
+    on<RejectReportEvent>(_onRejectReport);
     on<ToggleVoteEvent>(_onToggleVote);
     on<GetVotesEvent>(_onGetVotes);
     on<ClearReportErrorEvent>(_onClearError);
@@ -97,6 +103,26 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     result.fold(
       (failure) => emit(ReportError(failure.message)),
       (_) => emit(ReportDeleted()),
+    );
+  }
+
+  Future<void> _onApproveReport(
+      ApproveReportEvent event, Emitter<ReportState> emit) async {
+    emit(ReportLoading());
+    final result = await approveReport(event.id);
+    result.fold(
+      (failure) => emit(ReportError(failure.message)),
+      (report) => emit(ReportApproved(report)),
+    );
+  }
+
+  Future<void> _onRejectReport(
+      RejectReportEvent event, Emitter<ReportState> emit) async {
+    emit(ReportLoading());
+    final result = await rejectReport(event.id);
+    result.fold(
+      (failure) => emit(ReportError(failure.message)),
+      (report) => emit(ReportRejected(report)),
     );
   }
 

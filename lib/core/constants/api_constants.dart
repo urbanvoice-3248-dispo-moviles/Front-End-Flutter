@@ -14,6 +14,8 @@ class ApiConstants {
   static const String reportsByUser = '/reports/user';
   static const String reportsAll = '/reports/all';
   static const String reportsStatistics = '/reports/statistics';
+  static const String reportsApprove = '/reports';
+  static const String reportsReject = '/reports';
   static const String locations = '/locations';
   static const String locationsNearby = '/locations/nearby';
   static const String locationsByDistrict = '/locations/district';
@@ -32,4 +34,5 @@ class ApiConstants {
   static const String locationSharingSharedWithMe = '/location-sharing/shared-with-me';
   static const String locationSharingFriends = '/location-sharing/friends';
   static const String locationSharingMe = '/location-sharing/me';
+  static const String fcmTokens = '/fcm-tokens';
 }

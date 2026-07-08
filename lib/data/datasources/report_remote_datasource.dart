@@ -55,4 +55,16 @@ class ReportRemoteDataSource {
   Future<void> deleteReport(int id) async {
     await _client.delete('${ApiConstants.reports}/$id');
   }
+
+  Future<IncidentReportModel> approveReport(int id) async {
+    final response =
+        await _client.put('${ApiConstants.reportsApprove}/$id/approve');
+    return IncidentReportModel.fromJson(response.data);
+  }
+
+  Future<IncidentReportModel> rejectReport(int id) async {
+    final response =
+        await _client.put('${ApiConstants.reportsReject}/$id/reject');
+    return IncidentReportModel.fromJson(response.data);
+  }
 }

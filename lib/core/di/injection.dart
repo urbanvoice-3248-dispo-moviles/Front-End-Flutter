@@ -59,6 +59,7 @@ import '../../presentation/bloc/report/report_bloc.dart';
 import '../../presentation/bloc/route/route_bloc.dart';
 import '../../presentation/bloc/statistics/statistics_bloc.dart';
 import '../network/api_client.dart';
+import '../network/fcm_service.dart';
 import '../network/token_manager.dart';
 
 final sl = GetIt.instance;
@@ -74,6 +75,7 @@ Future<void> initDependencies() async {
 void _initCore() {
   sl.registerLazySingleton<ApiClient>(() => ApiClient());
   sl.registerLazySingleton<TokenManager>(() => TokenManager());
+  sl.registerLazySingleton<FcmService>(() => FcmService());
 }
 
 void _initDataSources() {
@@ -144,6 +146,8 @@ void _initUseCases() {
   sl.registerLazySingleton<GetNearbyReports>(
       () => GetNearbyReports(sl()));
   sl.registerLazySingleton<DeleteReport>(() => DeleteReport(sl()));
+  sl.registerLazySingleton<ApproveReport>(() => ApproveReport(sl()));
+  sl.registerLazySingleton<RejectReport>(() => RejectReport(sl()));
   sl.registerLazySingleton<GetAllLocations>(
       () => GetAllLocations(sl()));
   sl.registerLazySingleton<GetNearbyLocations>(
@@ -189,6 +193,7 @@ void _initBlocs() {
         getProfileByEmail: sl(),
         getProfileById: sl(),
         tokenManager: sl(),
+        fcmService: sl(),
       ));
   sl.registerFactory<ReportBloc>(() => ReportBloc(
         createReport: sl(),
@@ -196,6 +201,8 @@ void _initBlocs() {
         getReportsByUser: sl(),
         getNearbyReports: sl(),
         deleteReport: sl(),
+        approveReport: sl(),
+        rejectReport: sl(),
         toggleVote: sl(),
         getVotes: sl(),
       ));

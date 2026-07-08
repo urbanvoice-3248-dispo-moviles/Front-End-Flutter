@@ -33,4 +33,8 @@ abstract class ReportRepository {
   });
 
   Future<Either<Failure, void>> deleteReport(int id);
+
+  Future<Either<Failure, IncidentReport>> approveReport(int id);
+
+  Future<Either<Failure, IncidentReport>> rejectReport(int id);
 }

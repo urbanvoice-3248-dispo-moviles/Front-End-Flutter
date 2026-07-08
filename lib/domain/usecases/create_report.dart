@@ -80,3 +80,23 @@ class DeleteReport {
     return repository.deleteReport(id);
   }
 }
+
+class ApproveReport {
+  final ReportRepository repository;
+
+  ApproveReport(this.repository);
+
+  Future<Either<Failure, IncidentReport>> call(int id) {
+    return repository.approveReport(id);
+  }
+}
+
+class RejectReport {
+  final ReportRepository repository;
+
+  RejectReport(this.repository);
+
+  Future<Either<Failure, IncidentReport>> call(int id) {
+    return repository.rejectReport(id);
+  }
+}

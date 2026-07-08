@@ -23,7 +23,7 @@ class RouteBloc extends Bloc<RouteEvent, RouteState> {
     result.fold(
       (failure) => emit(RouteError(failure.message)),
       (assessment) =>
-          emit(RouteLoaded(assessment, event.origin, event.destination)),
+          emit(RouteLoaded(assessment, event.origin, event.destination, event.decodedPath)),
     );
   }
 

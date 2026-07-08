@@ -5,6 +5,7 @@ import '../../../domain/entities/user_profile.dart';
 import '../../../domain/usecases/auth_usecases.dart';
 import '../../../domain/usecases/profile_usecases.dart';
 import '../../../core/network/token_manager.dart';
+import '../../../core/network/fcm_service.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -15,6 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GetProfileByEmail getProfileByEmail;
   final GetProfileById getProfileById;
   final TokenManager tokenManager;
+  final FcmService fcmService;
 
   AuthBloc({
     required this.loginUser,
@@ -22,6 +24,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this.getProfileByEmail,
     required this.getProfileById,
     required this.tokenManager,
+    required this.fcmService,
   }) : super(AuthInitial()) {
     on<RegisterEvent>(_onRegister);
     on<LoginEvent>(_onLogin);
@@ -126,6 +129,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLogout(
       LogoutEvent event, Emitter<AuthState> emit) async {
+    try {
+      await fcmService.deleteToken();
+    } catch (_) {}
     await tokenManager.clearSession();
     emit(AuthInitial());
   }

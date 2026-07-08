@@ -15,11 +15,12 @@ class RouteLoaded extends RouteState {
   final RouteAssessment assessment;
   final Map<String, double> origin;
   final Map<String, double> destination;
+  final List<List<double>> decodedPath;
 
-  const RouteLoaded(this.assessment, this.origin, this.destination);
+  const RouteLoaded(this.assessment, this.origin, this.destination, this.decodedPath);
 
   @override
-  List<Object?> get props => [assessment, origin, destination];
+  List<Object?> get props => [assessment, origin, destination, decodedPath];
 }
 
 class RouteError extends RouteState {

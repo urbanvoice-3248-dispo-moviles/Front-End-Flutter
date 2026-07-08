@@ -204,6 +204,7 @@ class _HomePageState extends State<HomePage> {
         setState(() => _showRiskMap = !_showRiskMap);
         Navigator.pop(context);
       }),
+      drawerEnableOpenDragGesture: false,
       body: BlocBuilder<LocationBloc, LocationState>(
         builder: (context, locState) {
           if (locState is LocationsLoaded) {

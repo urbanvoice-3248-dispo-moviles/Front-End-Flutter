@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 import 'core/di/injection.dart';
+import 'core/network/fcm_service.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/bloc/alert/alert_bloc.dart';
 import 'presentation/bloc/auth/auth_bloc.dart';
@@ -17,6 +18,8 @@ import 'presentation/bloc/statistics/statistics_bloc.dart';
 import 'presentation/pages/home_page.dart';
 import 'presentation/pages/login_page.dart';
 import 'presentation/pages/terms_page.dart';
+
+final fcmService = FcmService();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +38,16 @@ class _UrbanVoiceAppState extends State<UrbanVoiceApp> {
   @override
   void initState() {
     super.initState();
+    _initializeFcm();
     GetIt.instance<AuthBloc>().add(CheckSavedSessionEvent());
+  }
+
+  Future<void> _initializeFcm() async {
+    try {
+      await fcmService.initialize();
+    } catch (_) {
+      // Firebase no configurado en este entorno
+    }
   }
 
   @override

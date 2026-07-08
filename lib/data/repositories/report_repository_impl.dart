@@ -121,4 +121,28 @@ class ReportRepositoryImpl implements ReportRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, IncidentReport>> approveReport(int id) async {
+    try {
+      final model = await _remoteDataSource.approveReport(id);
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Error al aprobar reporte'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, IncidentReport>> rejectReport(int id) async {
+    try {
+      final model = await _remoteDataSource.rejectReport(id);
+      return Right(model.toEntity());
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Error al rechazar reporte'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

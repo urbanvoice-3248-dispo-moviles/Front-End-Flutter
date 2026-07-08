@@ -111,3 +111,21 @@ class GetVotesEvent extends ReportEvent {
 }
 
 class ClearReportErrorEvent extends ReportEvent {}
+
+class ApproveReportEvent extends ReportEvent {
+  final int id;
+
+  const ApproveReportEvent(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+class RejectReportEvent extends ReportEvent {
+  final int id;
+
+  const RejectReportEvent(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
